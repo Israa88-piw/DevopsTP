@@ -46,14 +46,13 @@ pipeline {
             steps {
                 script {
                     // Vérifier que le fichier WAR existe
-                    def warFile = findFiles(glob: 'target/*.war')[0].path
-                    echo "Déploiement du fichier: ${warFile}"
-                    
-                    // Déployer sur Tomcat
-                    deploy adapters: [tomcat9(credentialsId: 'tomcat-credentials', 
-                                            url: 'http://localhost:8080')], 
-                            contextPath: 'devopsapp',
-                            war: 'target/*.war'
+                    def files = findFiles(glob: 'target/*.war')
+                    if (files.length > 0) {
+                        echo "Fichier WAR trouvé: ${files[0].name}"
+                        // Ici vous ajouterez le déploiement plus tard
+                    } else {
+                        error "Aucun fichier WAR trouvé dans target/"
+                    }
                 }
             }
         }
@@ -62,15 +61,11 @@ pipeline {
     post {
         always {
             echo 'Pipeline CI/CD terminé'
-            cleanWs() // Nettoyer l workspace
+            // Remplacer cleanWs() par deleteDir() qui est disponible
+            deleteDir()
         }
         success {
-            echo 'SUCCÈS: Application déployée sur Tomcat!'
-            emailext (
-                subject: "SUCCÈS: Build ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Le build ${env.BUILD_URL} a réussi",
-                to: "votre-email@example.com"
-            )
+            echo 'SUCCÈS: Build réussi!'
         }
         failure {
             echo 'ÉCHEC: Le pipeline a rencontré une erreur'
