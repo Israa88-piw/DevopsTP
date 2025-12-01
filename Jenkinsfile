@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven '/usr/local/src/maven'
-        jdk '/usr/lib/jvm/java-17'
+        jdk 'JDK17'
     }
 
     stages {
